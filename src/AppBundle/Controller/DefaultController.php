@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Service\GoogleServices;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -11,6 +12,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends Controller
 {
+
+    public function __construct() {
+    }
+
     /**
      * @Route("/loginGoogle", name="loginGoogle")
      */
@@ -19,20 +24,14 @@ class DefaultController extends Controller
             return $this->forward( 'AppBundle\\Controller\\DefaultController::indexAction');
         }
 
-        $session = $request->getSession();
-        $client = new \Google_Client();
-        $secret_path = $this->get('kernel')->getRootDir() . '/Resources/client_secret.json';
-        $client->setAuthConfigFile($secret_path);
-        $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/loginGoogle');
-        $client->addScope(\Google_Service_Gmail::GMAIL_READONLY);
-
         $token = $request -> get('code', null);
         if ($token == null) {
-            $auth_url = $client->createAuthUrl();
+            $auth_url = $this -> get('google_services') -> createAuthUrl();
             return $this -> redirect($auth_url);
         } else {
-            $client->authenticate($token);
-            $session -> set('access_token', $client->getAccessToken());
+            $access_token = $this -> get('google_services') -> authenticateCode($token);
+            $session = $request->getSession();
+            $session -> set('access_token', $access_token);
             $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/';
             return $this -> redirect($redirect_uri);
         }
@@ -60,7 +59,9 @@ class DefaultController extends Controller
             return $this->forward( 'AppBundle\\Controller\\DefaultController::loginAction');
         }
 
-        return array();
+        $this -> refreshToken($request);
+        $messages = $this -> get('google_services') -> messages(10);
+        return array("messages" => $messages);
     }
 
     /**
@@ -74,6 +75,13 @@ class DefaultController extends Controller
 
     public function isAuthentified(Request $request) {
         $session = $request->getSession();
-        return $access_token = $session -> get('access_token', null) != null;
+        return $session -> get('access_token', null) != null;
+    }
+
+    public function refreshToken(Request $request) {
+        $session = $request->getSession();
+        $access_token = $session -> get('access_token', null);
+        $access_token = $this -> get('google_services') -> refreshToken($access_token);
+        $session -> set('access_token', $access_token);
     }
 }

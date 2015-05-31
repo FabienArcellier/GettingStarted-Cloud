@@ -1,6 +1,10 @@
 {% extends 'layout.html.twig' %}
 
 {% block body %}
+    <div class="list-group">
+    {% for message in messages %}
 
-    Utilisateur authentifie
+        <a href="#" class="list-group-item">{{ message.snippet }}<span class="badge">{{ message.sizeEstimate }}</span></a>
+    {% endfor %}
+    </div>
 {% endblock %}

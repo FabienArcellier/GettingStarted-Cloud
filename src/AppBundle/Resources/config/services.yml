@@ -1,0 +1,13 @@
+parameters:
+  # ...
+  google_client.class: Google_Client
+  google_services.class: AppBundle\Service\GoogleServices
+
+
+services:
+  google_client:
+    class: %google_client.class%
+
+  google_services:
+    class:     %google_services.class%
+    arguments: [@google_client, "%kernel.root_dir%/Resources/client_secret.json"]
