@@ -50,7 +50,7 @@ class GoogleServices {
         $snippets = array();
         foreach($results as $value) {
             $message = $this -> _gmailService -> users_messages -> get($user, $value['id']);
-            $snippets[] = array("snippet" => $message['snippet'], "sizeEstimate" => $message['sizeEstimate']);
+            $snippets[] = array("snippet" => htmlspecialchars_decode($message['snippet'],ENT_QUOTES), "sizeEstimate" => $message['sizeEstimate']);
         }
 
         return $snippets;
