@@ -10,4 +10,3 @@
 /vendor/
 /web/bundles/
 .idea
-/app/Resources/client_secret.json
