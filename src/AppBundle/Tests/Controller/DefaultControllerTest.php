@@ -13,6 +13,6 @@ class DefaultControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/login');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertTrue($crawler->filter('html:contains("Sign in with Google")')->count() > 0);
+        $this->assertTrue($crawler->filter('html:contains("Sign in with Facebook")')->count() > 0);
     }
 }
