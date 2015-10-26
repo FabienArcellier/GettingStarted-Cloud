@@ -1,0 +1,7 @@
+language: php
+php:
+  - 5.4
+install:
+  - composer update
+ 
+script: bin/phpunit -c app/phpunit.xml
